@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://joshua-michelle-wedding.vercel.app"),
   title: "Joshua & Michelle — Wedding Invitation",
   description: "Join Joshua and Michelle for their garden wedding at Takun Retreat Club on 19 June 2027.",
   icons: { icon: "/favicon.svg" },

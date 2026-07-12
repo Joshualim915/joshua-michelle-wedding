@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { getSupabase } from "./supabase";
 
 const events = [
   ["4:30 PM", "Guest arrival & welcome drinks"],
@@ -19,10 +20,12 @@ const menu = {
 
 function Countdown() {
   const wedding = new Date("2027-06-19T17:15:00+08:00").getTime();
-  const [left, setLeft] = useState(Math.max(0, wedding - Date.now()));
+  const [left, setLeft] = useState(0);
 
   useEffect(() => {
-    const timer = window.setInterval(() => setLeft(Math.max(0, wedding - Date.now())), 1000);
+    const tick = () => setLeft(Math.max(0, wedding - Date.now()));
+    tick();
+    const timer = window.setInterval(tick, 1000);
     return () => window.clearInterval(timer);
   }, [wedding]);
 
@@ -56,6 +59,8 @@ export default function Home() {
   const [opened, setOpened] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [attending, setAttending] = useState("yes");
 
   useEffect(() => {
@@ -77,9 +82,42 @@ export default function Home() {
     return () => observer.disconnect();
   }, []);
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setSubmitError(null);
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const name = String(data.get("name") ?? "").trim();
+    const isAttending = String(data.get("attending") ?? "").trim();
+    const row = {
+      name,
+      attending: (isAttending === "no" ? "no" : "yes") as "yes" | "no",
+      guests: isAttending === "no" ? null : Number(data.get("guests") ?? "1") || 1,
+      appetizer: isAttending === "no" ? null : String(data.get("appetizer") ?? "").trim() || null,
+      main: isAttending === "no" ? null : String(data.get("main") ?? "").trim() || null,
+      carbs: isAttending === "no" ? null : String(data.get("carbs") ?? "").trim() || null,
+      dessert: isAttending === "no" ? null : String(data.get("dessert") ?? "").trim() || null,
+      dietary: String(data.get("dietary") ?? "").trim() || null,
+      song: String(data.get("song") ?? "").trim() || null,
+    };
+    try {
+      const { error } = await getSupabase()
+        .from("rsvps")
+        .insert(row);
+      if (error) throw error;
+      setSubmitted(true);
+      form.reset();
+      setAttending("yes");
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : "Sorry, we couldn't save your RSVP. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return <main className={opened ? "invitation is-open" : "invitation"}>
@@ -167,7 +205,7 @@ export default function Home() {
       <section className="section closing">
         <img src="/takun-garden.png" alt="" aria-hidden="true" />
         <div className="closing-wash" />
-        <div className="reveal closing-copy"><p className="eyebrow">Kindly reply by 19 May 2027</p><h2>Will you join us<br />in the garden?</h2><p className="body-copy">We can’t wait to celebrate this beautiful day with the people we love most.</p><button className="primary-button" onClick={() => { setSubmitted(false); setRsvpOpen(true); }}>Confirm your attendance</button><p className="monogram">J <i>&amp;</i> M</p></div>
+        <div className="reveal closing-copy"><p className="eyebrow">Kindly reply by 19 May 2027</p><h2>Will you join us<br />in the garden?</h2><p className="body-copy">We can’t wait to celebrate this beautiful day with the people we love most.</p><button className="primary-button" onClick={() => { setSubmitted(false); setSubmitError(null); setRsvpOpen(true); }}>Confirm your attendance</button><p className="monogram">J <i>&amp;</i> M</p></div>
       </section>
     </div>
 
@@ -181,7 +219,8 @@ export default function Home() {
             <label>Your name<input required name="name" autoComplete="name" placeholder="Full name" /></label>
             <fieldset><legend>Will you be attending?</legend><label className="choice"><input required type="radio" name="attending" value="yes" checked={attending === "yes"} onChange={() => setAttending("yes")} /> Joyfully accepts</label><label className="choice"><input type="radio" name="attending" value="no" checked={attending === "no"} onChange={() => setAttending("no")} /> Regretfully declines</label></fieldset>
             {attending === "yes" && <><label>Number of guests<select name="guests" defaultValue="1"><option>1</option><option>2</option><option>3</option><option>4</option></select></label><div className="menu-heading"><p className="eyebrow">Your dinner selections</p><h3>Choose one from each course</h3></div><MenuChoices /><label>Dietary requirements<textarea name="dietary" placeholder="Allergies or dietary needs" /></label><label>A song that gets you dancing<input name="song" placeholder="Your dance-floor request" /></label></>}
-            <button className="primary-button" type="submit">Send my RSVP</button>
+            {submitError && <p className="rsvp-error" role="alert">{submitError}</p>}
+            <button className="primary-button" type="submit" disabled={submitting}>{submitting ? "Sending…" : "Send my RSVP"}</button>
           </form>}
       </div>
     </div>}
