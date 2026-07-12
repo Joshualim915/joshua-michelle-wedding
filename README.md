@@ -1,98 +1,66 @@
-# vinext-starter
+# Joshua & Michelle — Wedding Invitation
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+A garden-wedding invitation and RSVP site for **Joshua & Michelle**, 19 June 2027,
+at Takun Retreat Club, Rawang, Selangor.
+
+Built with **Next.js 16** (App Router), **Tailwind CSS v4**, and **Supabase** for
+RSVP storage. Deployed on **Vercel**.
 
 ## Prerequisites
 
 - Node.js `>=22.13.0`
+- A Supabase project with the `rsvps` table (see below)
 
 ## Quick Start
 
 ```bash
 npm install
+cp .env.example .env.local   # then fill in your Supabase URL + anon key
 npm run dev
-npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+Visit http://localhost:3000
 
-## Included Shape
+## Environment Variables
 
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
+Copy `.env.example` to `.env.local` and fill in:
 
-## Workspace Auth Headers
+| Variable | Meaning |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | The `anon` public API key from Supabase Dashboard → Settings → API |
 
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
+Both must be prefixed `NEXT_PUBLIC_` so they reach the browser.
 
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
+## Database Setup
 
-Treat the full name as optional and fall back to email when it is absent:
+Run `supabase/migrations/0001_create_rsvps.sql` in the Supabase Dashboard →
+SQL Editor. This creates the `public.rsvps` table and enables Row Level
+Security so anonymous guests can insert RSVPs but cannot read other people's
+submissions.
 
-```tsx
-import { headers } from "next/headers";
+Stored columns: `name`, `attending` (yes/no), `guests`, `appetizer`, `main`,
+`carbs`, `dessert`, `dietary`, `song`, `created_at`.
 
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
+## Deploy to Vercel
 
-  const displayName = fullName ?? email;
-  // ...
-}
-```
-
-## Optional Dispatch-Owned ChatGPT Sign-In
-
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
-
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
-
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
-
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
-
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+1. Push this repo to GitHub.
+2. In Vercel → New Project → import the GitHub repo.
+3. Settings:
+   - **Framework Preset:** Next.js (auto-detected)
+   - **Root Directory:** `./` (the repo root — leave default)
+   - **Build Command:** `next build` (default — leave as-is)
+   - **Output Directory:** `.next` (default — leave as-is)
+   - **Install Command:** `npm install` (default — leave as-is)
+4. Add Environment Variables in Vercel → Project → Settings → Environment Variables:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Deploy. Vercel will build and give you a `*.vercel.app` URL.
 
 ## Useful Commands
 
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+- `npm run dev`: local development
+- `npm run build`: production build
+- `npm run start`: serve the production build locally
+- `npm test`: run source-content tests
+- `npm run lint`:	eslint
