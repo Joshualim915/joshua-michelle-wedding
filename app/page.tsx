@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { getSupabase } from "./supabase";
+import { EnvelopeIntro } from "./components/EnvelopeIntro";
 
 const events = [
   ["4:30 PM", "Guest arrival & welcome drinks"],
@@ -125,40 +126,6 @@ function MenuChoices() {
   );
 }
 
-function FloatingFlowers() {
-  const petals = useMemo(
-    () =>
-      Array.from({ length: 14 }, (_, i) => ({
-        i,
-        left: `${(i * 7.3) % 100}%`,
-        delay: `${(i * 0.7) % 5}s`,
-        duration: `${6 + (i % 4)}s`,
-        size: `${14 + (i % 12)}px`,
-        drift: `${-30 + (i % 5) * 15}px`,
-      })),
-    [],
-  );
-
-  return (
-    <div className="floating-flowers" aria-hidden="true">
-      {petals.map((p) => (
-        <span
-          key={p.i}
-          className="petal"
-          style={{
-            left: p.left,
-            width: p.size,
-            height: p.size,
-            animationDelay: p.delay,
-            animationDuration: p.duration,
-            ["--drift" as string]: p.drift,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 function AddToCalendar() {
   function downloadIcs() {
     const ics = [
@@ -194,7 +161,7 @@ function AddToCalendar() {
 }
 
 export default function Home() {
-  const [opened, setOpened] = useState(false);
+  const [introComplete, setIntroComplete] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -202,9 +169,9 @@ export default function Home() {
   const [attending, setAttending] = useState("yes");
 
   useEffect(() => {
-    document.body.classList.toggle("envelope-locked", !opened);
+    document.body.classList.toggle("envelope-locked", !introComplete);
     return () => document.body.classList.remove("envelope-locked");
-  }, [opened]);
+  }, [introComplete]);
 
   useEffect(() => {
     const nodes = document.querySelectorAll<HTMLElement>(".reveal");
@@ -260,41 +227,15 @@ export default function Home() {
   }
 
   return (
-    <main className={opened ? "invitation is-open" : "invitation"}>
-      <section className="envelope-scene" aria-label="Wedding invitation envelope">
-        <div className="envelope">
-          <div className="envelope-back" aria-hidden="true" />
-          <div className="envelope-light" aria-hidden="true" />
-          <div className="letter-card">
-            <small>19 · 06 · 2027</small>
-            <span>
-              J <i>&amp;</i> M
-            </span>
-            <em>Takun Retreat Club</em>
-          </div>
-          <div className="envelope-panel envelope-panel-left" aria-hidden="true" />
-          <div className="envelope-panel envelope-panel-right" aria-hidden="true" />
-          <div className="envelope-flap" aria-hidden="true" />
-          <div className="envelope-glow" aria-hidden="true" />
-          <button
-            className="seal"
-            onClick={() => setOpened(true)}
-            aria-label="Open the invitation"
-          >
-            <span>J&amp;M</span>
-          </button>
-          <p className="tap-note">Tap the seal to open</p>
-        </div>
-      </section>
-
-      <FloatingFlowers />
+    <main className={introComplete ? "invitation intro-complete" : "invitation"}>
+      <EnvelopeIntro onComplete={() => setIntroComplete(true)} />
 
       <div className="story">
-        <section className="hero section">
+        <section className="hero section" id="invitation-hero" tabIndex={-1}>
           <div className="hero-photo" />
           <div className="hero-wash" />
-          <div className="flower-corner flower-left" aria-hidden="true" />
-          <div className="flower-corner flower-right" aria-hidden="true" />
+          <img className="flower-corner flower-left" src="/assets/florals/garden-floral-left.png" alt="" aria-hidden="true" />
+          <img className="flower-corner flower-right" src="/assets/florals/garden-floral-right.png" alt="" aria-hidden="true" />
           <div className="reveal hero-copy">
             <p className="eyebrow">Together with their families</p>
             <p className="date-top">19 · 06 · 2027</p>
@@ -311,7 +252,7 @@ export default function Home() {
         </section>
 
         <section className="section welcome" id="welcome">
-          <div className="botanical-stem stem-one" aria-hidden="true" />
+          <img className="botanical-stem stem-one" src="/assets/florals/garden-floral-right.png" alt="" aria-hidden="true" />
           <div className="reveal">
             <p className="eyebrow">Our next chapter</p>
             <h2>

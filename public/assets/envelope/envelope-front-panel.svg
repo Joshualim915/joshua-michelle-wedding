@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1800" preserveAspectRatio="none">
+  <defs>
+    <linearGradient id="paper" x1=".5" y1="1" x2=".5" y2="0"><stop stop-color="#eee5d7"/><stop offset=".58" stop-color="#f8f3ea"/><stop offset="1" stop-color="#d9cbb7"/></linearGradient>
+    <filter id="s"><feDropShadow dx="0" dy="-8" stdDeviation="12" flood-color="#5e4b38" flood-opacity=".2"/></filter>
+  </defs>
+  <path d="M0 1800h1200L600 900z" fill="url(#paper)" filter="url(#s)"/>
+  <path d="M29 1770h1142L600 928z" fill="none" stroke="#fff" stroke-opacity=".44" stroke-width="3"/>
+</svg>

@@ -11,6 +11,14 @@
   --white: #fffdf8;
   --rose: #b85c5c;
   --wax: #8a3b3b;
+  --wedding-ivory: #f4eee2;
+  --wedding-white: #fffdf8;
+  --wedding-beige: #d8c9b4;
+  --wedding-sage: #7c8a75;
+  --wedding-olive: #52634f;
+  --wax-red: #7c1918;
+  --wax-highlight: #d67065;
+  --paper-shadow: rgba(76, 60, 43, .28);
 }
 
 * { box-sizing: border-box; }
@@ -255,6 +263,67 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .is-open .envelope-glow { opacity: 1; transform: translate(-50%, -50%) scale(4); transition: all 1s ease; }
 .is-open .tap-note, .is-open .envelope-scene { opacity: 0; visibility: hidden; pointer-events: none; }
 
+/* ---------------- Layered cinematic envelope intro ----------------
+   Stack: atmosphere → back botanicals → envelope back/lining → card →
+   side/bottom/top flaps → wax → foreground botanicals. All stationery
+   SVGs are authored on a shared 1200 × 1800 coordinate system. */
+.envelope-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+  overflow: hidden;
+  color: #536052;
+  background: transparent;
+  isolation: isolate;
+  perspective: 2200px;
+  transition: opacity 1.05s cubic-bezier(.22,.61,.36,1);
+}
+.skip-intro { position:absolute; top:max(18px,env(safe-area-inset-top)); right:18px; z-index:30; min-height:40px; padding:0 12px; border:0; border-bottom:1px solid rgba(67,81,66,.42); color:#536052; background:rgba(255,253,248,.28); text-transform:uppercase; letter-spacing:.18em; font-size:8px; cursor:pointer; backdrop-filter:blur(5px) }
+.skip-intro:focus-visible,.wax-trigger:focus-visible{outline:2px solid #5a6b58;outline-offset:5px}
+.intro-loader { display:grid; place-items:center; gap:18px; text-align:center; }
+.intro-loader span { width:38px; aspect-ratio:1; border:1px solid rgba(82,99,79,.22); border-top-color:#61715e; border-radius:50%; animation:loader-spin 1.2s linear infinite; }
+.intro-loader p { margin:0; text-transform:uppercase; letter-spacing:.25em; font-size:8px; }
+@keyframes loader-spin{to{rotate:360deg}}
+.envelope-stage {
+  --stage-width: max(100vw, calc(100dvh * 2 / 3));
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--stage-width);
+  aspect-ratio: 2 / 3;
+  transform-style: preserve-3d;
+  transform: translate(-50%,-50%);
+  flex: none;
+}
+.envelope-assembly { position:absolute; inset:0; transform-style:preserve-3d; filter:drop-shadow(0 18px 28px rgba(60,49,35,.16)); }
+.envelope-layer,.flap-wrap,.flap-wrap>img { position:absolute; inset:0; width:100%; height:100%; display:block; }
+.envelope-layer,.flap-wrap>img{pointer-events:none}
+.layer-back{z-index:1}.layer-lining{z-index:2;opacity:.72;transition:opacity .8s ease}.layer-texture{z-index:12;opacity:.32;mix-blend-mode:multiply;object-fit:cover;transition:opacity .7s ease;}
+.interior-glow { position:absolute; z-index:3; left:5%; right:5%; top:31%; height:34%; border-radius:50%; opacity:0; transform:scale(.72); background:radial-gradient(ellipse,rgba(255,247,218,.72),rgba(228,178,103,.24) 48%,transparent 72%); filter:blur(20px); mix-blend-mode:screen; transition:opacity .7s ease .12s,transform .9s cubic-bezier(.22,.61,.36,1) .12s; }
+.flap-wrap { transform-style:preserve-3d; backface-visibility:hidden; will-change:transform; }
+.flap-left{z-index:7}.flap-right{z-index:8}.flap-bottom{z-index:9}.flap-top{z-index:14;transform-origin:50% 0;transition:transform .88s cubic-bezier(.22,.72,.2,1),filter .88s ease}
+.wax-trigger { position:absolute; z-index:22; left:50%; top:51.8%; width:clamp(108px,25%,190px); aspect-ratio:640 / 594; padding:0; translate:-50% -50%; border:0; background:transparent; cursor:pointer; filter:drop-shadow(0 13px 10px rgba(48,17,14,.3)); animation:wax-idle 2.8s ease-in-out infinite; transition:filter .65s ease; pointer-events:auto; }
+.wax-trigger img{width:100%;height:100%;display:block;object-fit:contain}.wax-trigger:disabled{cursor:default}.wax-halo{position:absolute;inset:4%;z-index:-1;border-radius:50%;opacity:.36;background:radial-gradient(circle,rgba(255,215,149,.76),rgba(255,186,94,.2) 50%,transparent 72%);filter:blur(8px);animation:wax-halo 2.2s ease-in-out infinite}
+@keyframes wax-idle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-4px) rotate(-.8deg)}}@keyframes wax-halo{50%{opacity:.74;transform:scale(1.18)}}
+.intro-prompt { position:fixed; left:0; right:0; bottom:max(24px,env(safe-area-inset-bottom)); z-index:24; margin:0; text-align:center; text-transform:uppercase; letter-spacing:.28em; font-size:8px; color:#647062; transition:opacity .3s ease,transform .3s ease; }
+
+/* Reference-matched cover timeline: the top flap and attached wax seal move
+   together to roughly 40% open, then the cover fades to the live homepage. */
+.intro-opening .wax-trigger,.intro-opened .wax-trigger,.intro-transitioning .wax-trigger{animation:none;filter:drop-shadow(0 18px 16px rgba(48,17,14,.26))}
+.intro-opening .wax-halo,.intro-opened .wax-halo,.intro-transitioning .wax-halo{opacity:.72;transform:scale(1.35)}
+.intro-opening .intro-prompt,.intro-opened .intro-prompt,.intro-transitioning .intro-prompt{opacity:0;transform:translateY(8px)}
+.intro-opening .interior-glow,.intro-opened .interior-glow,.intro-transitioning .interior-glow{opacity:1;transform:scale(1.18)}
+.intro-opening .layer-lining,.intro-opened .layer-lining,.intro-transitioning .layer-lining{opacity:1}
+.intro-opening .flap-top,.intro-opened .flap-top,.intro-transitioning .flap-top{transform:rotateX(72deg) translateZ(5px);filter:drop-shadow(0 22px 24px rgba(68,48,28,.2))}
+.intro-transitioning{opacity:0;pointer-events:none}
+.intro-transitioning .layer-texture{opacity:.18}
+
+@media (orientation:landscape) and (max-height:650px){.skip-intro{top:12px}}
+@media (prefers-reduced-motion:reduce){.envelope-intro *{animation:none!important}.intro-transitioning{opacity:0;transition-duration:.38s}.intro-transitioning .flap-top{transform:rotateX(28deg)}}
+
 /* ---------------- Floating petals ---------------- */
 .floating-flowers {
   position: fixed;
@@ -314,39 +383,20 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .hero-copy { position: relative; z-index: 2; text-shadow: 0 2px 20px rgba(26, 40, 28, .32); }
 @keyframes hero-drift { to { scale: 1.13; translate: -1.5% 0; } }
 
-/* Real-looking CSS flower corners */
+/* Photographic garden florals are kept at the edges so the invitation copy
+   remains clear and the placement feels naturally grown into the frame. */
 .flower-corner {
   position: absolute;
   z-index: 2;
-  top: 4%;
-  width: 130px;
-  height: 130px;
-  opacity: .9;
-  filter: drop-shadow(0 4px 10px rgba(28, 43, 31, .18));
+  width: min(64vw, 355px);
+  height: auto;
+  object-fit: contain;
+  opacity: .86;
+  filter: drop-shadow(0 10px 18px rgba(23, 37, 27, .18));
+  pointer-events: none;
 }
-.flower-corner::before,
-.flower-corner::after {
-  content: "";
-  position: absolute;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 32% 30%, rgba(255, 253, 248, .98) 0 16%, rgba(248, 243, 235, .95) 35%, rgba(230, 222, 208, .9) 68%, transparent 72%);
-  box-shadow:
-    inset -3px -5px 10px rgba(170, 155, 135, .12),
-    0 3px 12px rgba(50, 40, 30, .1);
-}
-.flower-corner::before { width: 62px; height: 62px; top: 14px; left: 12px; }
-.flower-corner::after { width: 44px; height: 44px; top: 58px; left: 56px; }
-.flower-left { left: -14px; }
-.flower-right { right: -14px; transform: scaleX(-1); }
-.flower-corner i, .flower-corner b {
-  position: absolute;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, rgba(255, 251, 246, .9) 0 14%, rgba(238, 230, 218, .85) 45%, transparent 68%);
-  box-shadow: 0 2px 8px rgba(50, 40, 30, .08);
-}
-.flower-corner i { width: 26px; height: 26px; left: 76px; top: 24px; }
-.flower-corner b { width: 18px; height: 18px; left: 34px; top: 84px; }
+.flower-left { left: -28%; bottom: -18%; transform:rotate(-8deg); }
+.flower-right { right: -24%; top: -22%; transform:rotate(7deg); }
 
 .eyebrow { margin: 0 0 20px; text-transform: uppercase; letter-spacing: .3em; font-size: 8px; font-weight: 500; }
 .date-top { margin: 0 0 44px; font: 19px "Cormorant Garamond"; letter-spacing: .26em; }
@@ -365,24 +415,14 @@ h2 { margin: 0 0 25px; color: var(--deep); font: 400 40px/1.04 "Cormorant Garamo
 .welcome > .reveal { position: relative; z-index: 1; }
 .botanical-stem {
   position: absolute;
-  width: 210px;
-  height: 410px;
-  border: 1px solid rgba(116, 128, 108, .24);
-  border-width: 0 0 0 1px;
-  border-radius: 50%;
-  transform: rotate(-24deg);
+  width: min(56vw, 300px);
+  height: auto;
+  object-fit: contain;
+  opacity: .24;
+  filter:saturate(.7);
+  pointer-events:none;
 }
-.botanical-stem::before, .botanical-stem::after {
-  content: "";
-  position: absolute;
-  width: 44px;
-  height: 18px;
-  border-radius: 100% 0 100% 0;
-  background: rgba(116, 128, 108, .14);
-}
-.botanical-stem::before { left: -7px; top: 120px; rotate: 22deg; }
-.botanical-stem::after { left: -35px; top: 230px; rotate: -154deg; }
-.stem-one { right: -115px; bottom: -70px; }
+.stem-one { right: -24%; bottom: -16%; transform:rotate(5deg); }
 
 .flower-divider { margin: 34px 0; color: #9aa18f; font: 18px "Cormorant Garamond"; display: flex; align-items: center; justify-content: center; gap: 14px; }
 .flower-divider span { display: inline-block; width: 50px; height: 1px; background: #c7c3b8; }
