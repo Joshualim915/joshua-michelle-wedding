@@ -18,9 +18,12 @@ test("page renders the invitation, countdown, and RSVP flow", async () => {
   assert.match(page, /Michelle/);
   assert.match(page, /Countdown/);
   assert.match(page, /2027-06-19/);
-  assert.match(page, /Confirm your attendance/);
+  assert.match(page, /RSVP/);
+  assert.match(page, /Add to calendar/);
   assert.match(page, /getSupabase/);
   assert.match(page, /from\("rsvps"\)/);
+  assert.match(page, /CourseSelector/);
+  assert.doesNotMatch(page, /Garden formal/);
 });
 
 test("supabase client is wired with public env vars", async () => {

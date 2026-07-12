@@ -42,3 +42,4 @@ tsconfig.tsbuildinfo
 /.vinext/
 /outputs/
 /work/
+references/
