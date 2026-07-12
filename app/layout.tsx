@@ -3,11 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Joshua & Michelle — Wedding Invitation",
-  description: "Join Joshua and Michelle as they celebrate their wedding on September 27, 2026.",
+  description: "Join Joshua and Michelle for their garden wedding at Takun Retreat Club on 19 June 2027.",
   icons: { icon: "/favicon.svg" },
   openGraph: {
-    title: "Joshua & Michelle — 27 · 09 · 2026",
-    description: "Join us for our wedding celebration in Kuala Lumpur.",
+    title: "Joshua & Michelle — 19 · 06 · 2027",
+    description: "Join us for our garden wedding at Takun Retreat Club.",
     images: [{ url: "/og.png", width: 1200, height: 630, alt: "Joshua and Michelle wedding invitation" }],
   },
   twitter: { card: "summary_large_image", images: ["/og.png"] },
