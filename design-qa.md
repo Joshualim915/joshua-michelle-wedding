@@ -73,6 +73,7 @@
 15. Moved the left and right panel layers outward (including their restrained open state) to protect the outer mobile viewport from the live homepage peeking through.
 16. Reduced the wax seal shadow to a small warm paper contact shadow in both idle and opening states, removing the dark frame effect beneath it.
 17. Enlarged the responsive scene to at least 118vw and a 118dvh-derived aspect-safe width, deliberately cropping the envelope beyond mobile edges. The side panels were brought inward to preserve a sealed, full-cover composition.
+18. Added a server-rendered intro gate that hides the RSVP story until `intro-complete` is set. This prevents slow device hydration or asset loading from flashing the landing page under the cover.
 
 ## Follow-up polish
 

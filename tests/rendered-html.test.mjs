@@ -33,6 +33,13 @@ test("envelope seal remains an explicit interactive control", async () => {
   assert.match(intro, /onClick=\{openInvitation\}/);
 });
 
+test("the RSVP content is server-gated until the intro completes", async () => {
+  const page = await read("app/page.tsx");
+  const layout = await read("app/layout.tsx");
+  assert.match(page, /invitation intro-pending/);
+  assert.match(layout, /\.intro-pending \.story\{visibility:hidden\}/);
+});
+
 test("venue gathering details follow the welcome and retired sections stay removed", async () => {
   const page = await read("app/page.tsx");
   const welcome = page.indexOf('className="section welcome"');

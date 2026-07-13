@@ -201,7 +201,7 @@ export default function Home() {
   }
 
   return (
-    <main className={introComplete ? "invitation intro-complete" : "invitation"}>
+    <main className={introComplete ? "invitation intro-complete" : "invitation intro-pending"}>
       <EnvelopeIntro onComplete={() => setIntroComplete(true)} />
       <FallingPetals />
 

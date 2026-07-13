@@ -29,6 +29,8 @@ button, input, select, textarea { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 
 .invitation { min-height: 100vh; }
+.intro-pending .story { visibility: hidden; }
+.intro-complete .story { visibility: visible; }
 
 /* ---------------- Envelope opening ---------------- */
 .envelope-scene {

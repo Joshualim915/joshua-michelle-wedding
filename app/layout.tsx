@@ -15,5 +15,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return (
+    <html lang="en">
+      <body>
+        {/* This arrives with the server HTML, before hydration, preventing a slow
+            device from flashing the RSVP page beneath the invitation cover. */}
+        <style>{`.intro-pending .story{visibility:hidden}`}</style>
+        {children}
+      </body>
+    </html>
+  );
 }
