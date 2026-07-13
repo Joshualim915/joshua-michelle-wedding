@@ -126,37 +126,11 @@ function MenuChoices() {
   );
 }
 
-function AddToCalendar() {
-  function downloadIcs() {
-    const ics = [
-      "BEGIN:VCALENDAR",
-      "VERSION:2.0",
-      "PRODID:-//Joshua & Michelle Wedding//EN",
-      "BEGIN:VEVENT",
-      "UID:joshua-michelle-wedding-2027",
-      "SUMMARY:Joshua & Michelle Wedding",
-      "DTSTART:20270619T083000Z",
-      "DTEND:20270619T143000Z",
-      "LOCATION:Takun Retreat Club, Rawang, Selangor",
-      "DESCRIPTION:Celebration of love in the garden. Details: https://maps.google.com/?q=Takun+Retreat+Club",
-      "END:VEVENT",
-      "END:VCALENDAR",
-    ].join("\r\n");
-    const blob = new Blob([ics], { type: "text/calendar" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "joshua-michelle-wedding.ics";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
+function FallingPetals() {
   return (
-    <button type="button" className="outline-button calendar-button" onClick={downloadIcs}>
-      Add to calendar <span>+</span>
-    </button>
+    <div className="floating-flowers" aria-hidden="true">
+      {Array.from({ length: 10 }, (_, index) => <span className="petal" key={index} />)}
+    </div>
   );
 }
 
@@ -229,6 +203,7 @@ export default function Home() {
   return (
     <main className={introComplete ? "invitation intro-complete" : "invitation"}>
       <EnvelopeIntro onComplete={() => setIntroComplete(true)} />
+      <FallingPetals />
 
       <div className="story">
         <section className="hero section" id="invitation-hero" tabIndex={-1}>
@@ -266,7 +241,9 @@ export default function Home() {
             </p>
             <div className="flower-divider">
               <span />
-              <i />
+              <span className="divider-flower" aria-hidden="true">
+                <img src="/white-flowers-composition-arrangement-delicate-petals-blossom.png" alt="" />
+              </span>
               <span />
             </div>
             <p className="script-label">The garden awaits in</p>
@@ -274,17 +251,17 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="venue-intro section photo-section">
-          <img src="/takun-lawn.png" alt="The white garden arches and lawn at Takun Retreat Club" />
-          <div className="photo-shade" />
-          <div className="reveal on-photo">
-            <p className="eyebrow">A place in nature</p>
-            <h2>
-              Takun
-              <br />
-              Retreat Club
-            </h2>
-            <p>Rawang, Selangor</p>
+        <section className="gallery-section section">
+          <div className="reveal gallery-copy">
+            <p className="eyebrow">Where we’ll celebrate</p>
+            <h2>Takun Retreat Club</h2>
+            <p className="body-copy">Nestled beside the forested hills of Rawang.</p>
+            <a className="outline-button gallery-location" href="https://maps.google.com/?q=Takun+Retreat+Club" target="_blank" rel="noreferrer">View location</a>
+          </div>
+          <div className="venue-gallery">
+            <figure className="reveal"><img src="/takun-garden.png" alt="Garden path and white arches at Takun Retreat Club" /><figcaption>The garden</figcaption></figure>
+            <figure className="reveal"><img src="/takun-arches.png" alt="Arched windows overlooking the green grounds" /><figcaption>The arches</figcaption></figure>
+            <figure className="reveal"><img src="/takun-entrance.png" alt="White arched entrance at Takun Retreat Club" /><figcaption>The arrival</figcaption></figure>
           </div>
         </section>
 
@@ -304,76 +281,6 @@ export default function Home() {
                   <p>{label}</p>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="gallery-section section">
-          <div className="reveal gallery-copy">
-            <p className="eyebrow">Where we’ll gather</p>
-            <h2>
-              Under open skies,
-              <br />
-              among the trees.
-            </h2>
-          </div>
-          <div className="venue-gallery">
-            <figure className="reveal">
-              <img src="/takun-garden.png" alt="Garden path and white arches at Takun Retreat Club" />
-              <figcaption>The garden</figcaption>
-            </figure>
-            <figure className="reveal">
-              <img src="/takun-arches.png" alt="Arched windows overlooking the green grounds" />
-              <figcaption>The arches</figcaption>
-            </figure>
-            <figure className="reveal">
-              <img src="/takun-entrance.png" alt="White arched entrance at Takun Retreat Club" />
-              <figcaption>The arrival</figcaption>
-            </figure>
-          </div>
-        </section>
-
-        <section className="section venue-details">
-          <div className="reveal">
-            <p className="eyebrow">The venue</p>
-            <h2>Takun Retreat Club</h2>
-            <p className="body-copy">
-              A quiet garden retreat nestled against the forested hills of Rawang, Selangor.
-            </p>
-            <AddToCalendar />
-            <a
-              className="outline-button"
-              href="https://maps.google.com/?q=Takun+Retreat+Club"
-              target="_blank"
-              rel="noreferrer"
-            >
-              View location <span>↗</span>
-            </a>
-          </div>
-        </section>
-
-        <section className="section details">
-          <div className="reveal detail-block">
-            <span className="line-icon">01</span>
-            <p className="eyebrow">Gifts</p>
-            <h2>Your presence</h2>
-            <p>Celebrating with you is the only gift we need. A card box will be available should you wish.</p>
-          </div>
-        </section>
-
-        <section className="section menu-preview">
-          <div className="reveal">
-            <p className="eyebrow">Dinner in the garden</p>
-            <h2>Choose your plate</h2>
-            <p className="body-copy">
-              Select one dish from each course when you confirm your attendance. We’ll prepare your
-              choices especially for you.
-            </p>
-            <div className="course-list">
-              <span>Appetizer</span>
-              <span>Main</span>
-              <span>Carbs</span>
-              <span>Dessert</span>
             </div>
           </div>
         </section>

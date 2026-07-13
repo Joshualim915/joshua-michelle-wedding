@@ -19,11 +19,32 @@ test("page renders the invitation, countdown, and RSVP flow", async () => {
   assert.match(page, /Countdown/);
   assert.match(page, /2027-06-19/);
   assert.match(page, /RSVP/);
-  assert.match(page, /Add to calendar/);
+  assert.doesNotMatch(page, /Add to calendar/);
   assert.match(page, /getSupabase/);
   assert.match(page, /from\("rsvps"\)/);
   assert.match(page, /CourseSelector/);
   assert.doesNotMatch(page, /Garden formal/);
+});
+
+test("envelope seal remains an explicit interactive control", async () => {
+  const intro = await read("app/components/EnvelopeIntro.tsx");
+  assert.match(intro, /aria-label="Open wedding invitation"/);
+  assert.match(intro, /onPointerDown=\{openInvitation\}/);
+  assert.match(intro, /onClick=\{openInvitation\}/);
+});
+
+test("venue gathering details follow the welcome and retired sections stay removed", async () => {
+  const page = await read("app/page.tsx");
+  const welcome = page.indexOf('className="section welcome"');
+  const gathering = page.indexOf('className="gallery-section section"');
+  assert.ok(welcome >= 0 && gathering > welcome, "gathering details should follow the welcome");
+  assert.match(page, /Where we’ll celebrate/);
+  assert.match(page, /Takun Retreat Club/);
+  assert.match(page, /Nestled beside the forested hills of Rawang/);
+  assert.match(page, /https:\/\/maps\.google\.com\/\?q=Takun\+Retreat\+Club/);
+  assert.doesNotMatch(page, /className="venue-intro/);
+  assert.doesNotMatch(page, /className="venue-details/);
+  assert.doesNotMatch(page, /className="menu-preview/);
 });
 
 test("supabase client is wired with public env vars", async () => {

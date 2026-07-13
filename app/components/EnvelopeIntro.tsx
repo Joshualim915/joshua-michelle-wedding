@@ -6,15 +6,13 @@ type IntroState = "loading" | "idle" | "opening" | "opened" | "transitioning" | 
 
 const assetRoot = "/assets/envelope";
 const criticalAssets = [
-  "envelope-back.svg",
-  "envelope-inner-lining.svg",
-  "envelope-top-flap.svg",
-  "envelope-left-flap.svg",
-  "envelope-right-flap.svg",
-  "envelope-front-panel.svg",
-  "paper-texture-real.jpg",
-  "wax-seal.png",
-].map((asset) => `${assetRoot}/${asset}`);
+  `${assetRoot}/panel-left.png`,
+  `${assetRoot}/panel-top.png`,
+  `${assetRoot}/panel-right.png`,
+  `${assetRoot}/panel-bottom.png`,
+  `${assetRoot}/paper-texture-real.jpg`,
+  `${assetRoot}/wax-seal.png`,
+];
 
 export function EnvelopeIntro({ onComplete }: { onComplete: () => void }) {
   const [state, setState] = useState<IntroState>("loading");
@@ -56,30 +54,27 @@ export function EnvelopeIntro({ onComplete }: { onComplete: () => void }) {
       return;
     }
     setState("opening");
-    timers.current.push(window.setTimeout(() => setState("opened"), 900));
-    timers.current.push(window.setTimeout(() => setState("transitioning"), 1080));
-    timers.current.push(window.setTimeout(finish, 2180));
+    timers.current.push(window.setTimeout(() => setState("opened"), 1900));
+    timers.current.push(window.setTimeout(() => setState("transitioning"), 2050));
+    timers.current.push(window.setTimeout(finish, 3050));
   }
 
   if (state === "complete") return null;
 
   return (
     <section className={`envelope-intro intro-${state}`} aria-label="Wedding invitation introduction">
-      <button className="skip-intro" type="button" onClick={finish}>Skip intro</button>
-
       {state === "loading" ? (
         <div className="intro-loader" role="status"><span /><p>Preparing your invitation</p></div>
       ) : (
         <div className="envelope-stage">
+          <div className="opening-bloom" aria-hidden="true" />
+          <div className="interior-glow" />
           <div className="envelope-assembly">
-            <img className="envelope-layer layer-back" src={`${assetRoot}/envelope-back.svg`} alt="" />
-            <img className="envelope-layer layer-lining" src={`${assetRoot}/envelope-inner-lining.svg`} alt="" />
-            <div className="interior-glow" />
-            <div className="flap-wrap flap-left"><img src={`${assetRoot}/envelope-left-flap.svg`} alt="" /></div>
-            <div className="flap-wrap flap-right"><img src={`${assetRoot}/envelope-right-flap.svg`} alt="" /></div>
-            <div className="flap-wrap flap-bottom"><img src={`${assetRoot}/envelope-front-panel.svg`} alt="" /></div>
+            <div className="flap-wrap flap-left"><img src={`${assetRoot}/panel-left.png`} alt="" /></div>
+            <div className="flap-wrap flap-right"><img src={`${assetRoot}/panel-right.png`} alt="" /></div>
+            <div className="flap-wrap flap-bottom"><img src={`${assetRoot}/panel-bottom.png`} alt="" /></div>
             <div className="flap-wrap flap-top">
-              <img src={`${assetRoot}/envelope-top-flap.svg`} alt="" />
+              <img src={`${assetRoot}/panel-top.png`} alt="" />
               <button
                 className="wax-trigger"
                 type="button"
@@ -97,10 +92,9 @@ export function EnvelopeIntro({ onComplete }: { onComplete: () => void }) {
                 <span className="wax-halo" aria-hidden="true" />
                 <img src={`${assetRoot}/wax-seal.png`} alt="" aria-hidden="true" />
               </button>
+              <span className="seal-cue" aria-hidden="true"><i />Tap to Open</span>
             </div>
-            <img className="envelope-layer layer-texture" src={`${assetRoot}/paper-texture-real.jpg`} alt="" />
           </div>
-          <p className="intro-prompt">Tap the seal to open</p>
         </div>
       )}
     </section>
