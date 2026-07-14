@@ -26,11 +26,18 @@ test("page renders the invitation, countdown, and RSVP flow", async () => {
   assert.doesNotMatch(page, /Garden formal/);
 });
 
-test("envelope seal remains an explicit interactive control", async () => {
+test("GIF-derived intro only begins on activation and retains the panel intro backup", async () => {
   const intro = await read("app/components/EnvelopeIntro.tsx");
-  assert.match(intro, /aria-label="Open wedding invitation"/);
-  assert.match(intro, /onPointerDown=\{openInvitation\}/);
-  assert.match(intro, /onClick=\{openInvitation\}/);
+  const backup = await read("app/components/EnvelopeIntro.backup.tsx");
+  assert.match(intro, /envelope-opening-slow\.mp4/);
+  assert.match(intro, /gif-cover-frame\.png/);
+  assert.match(intro, /animationDuration = 5280/);
+  assert.match(intro, /onClick=\{startAnimation\}/);
+  assert.match(intro, /image\?\.complete/);
+  assert.match(intro, /gif-white-transition/);
+  assert.match(backup, /LegacyEnvelopeIntro/);
+  assert.match(backup, /panel-left\.png/);
+  assert.match(backup, /wax-trigger/);
 });
 
 test("the RSVP content is server-gated until the intro completes", async () => {

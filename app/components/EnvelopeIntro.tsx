@@ -2,40 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 
-type IntroState = "loading" | "idle" | "opening" | "opened" | "transitioning" | "complete";
+type IntroState = "loading" | "idle" | "playing" | "transitioning" | "complete";
 
-const assetRoot = "/assets/envelope";
-const criticalAssets = [
-  `${assetRoot}/panel-left.png`,
-  `${assetRoot}/panel-top.png`,
-  `${assetRoot}/panel-right.png`,
-  `${assetRoot}/panel-bottom.png`,
-  `${assetRoot}/paper-texture-real.jpg`,
-  `${assetRoot}/wax-seal.png`,
-];
+const coverSrc = "/assets/envelope/gif-cover-frame.png";
+const animationSrc = "/assets/envelope/envelope-opening-slow.mp4";
+const animationDuration = 5280;
 
 export function EnvelopeIntro({ onComplete }: { onComplete: () => void }) {
   const [state, setState] = useState<IntroState>("loading");
   const timers = useRef<number[]>([]);
-  const openingStarted = useRef(false);
+  const started = useRef(false);
+  const video = useRef<HTMLVideoElement>(null);
+  const cover = useRef<HTMLImageElement>(null);
+
+  useEffect(() => () => timers.current.forEach(window.clearTimeout), []);
+
+  function markReady() {
+    setState((current) => current === "loading" ? "idle" : current);
+  }
 
   useEffect(() => {
-    let cancelled = false;
-    const activeTimers = timers.current;
-    Promise.all(
-      criticalAssets.map((src) => new Promise<void>((resolve) => {
-        const image = new Image();
-        image.onload = () => resolve();
-        image.onerror = () => resolve();
-        image.src = src;
-      })),
-    ).then(() => {
-      if (!cancelled) setState("idle");
-    });
-    return () => {
-      cancelled = true;
-      activeTimers.forEach(window.clearTimeout);
-    };
+    // On refresh, a cached image can finish before React attaches onLoad.
+    // Checking `complete` prevents the intro from being stranded on its loader.
+    const image = cover.current;
+    if (image?.complete) markReady();
   }, []);
 
   function finish() {
@@ -45,58 +35,49 @@ export function EnvelopeIntro({ onComplete }: { onComplete: () => void }) {
     window.setTimeout(() => document.querySelector<HTMLElement>("#invitation-hero")?.focus(), 40);
   }
 
-  function openInvitation() {
-    if (openingStarted.current) return;
-    openingStarted.current = true;
+  function beginTransition() {
+    setState((current) => current === "complete" ? current : "transitioning");
+  }
+
+  function startAnimation() {
+    if (started.current || state !== "idle") return;
+    started.current = true;
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setState("transitioning");
+      beginTransition();
       timers.current.push(window.setTimeout(finish, 420));
       return;
     }
-    setState("opening");
-    timers.current.push(window.setTimeout(() => setState("opened"), 1900));
-    timers.current.push(window.setTimeout(() => setState("transitioning"), 2050));
-    timers.current.push(window.setTimeout(finish, 3050));
+
+    setState("playing");
+    video.current?.play().catch(() => undefined);
+    timers.current.push(window.setTimeout(beginTransition, animationDuration - 460));
+    timers.current.push(window.setTimeout(finish, animationDuration + 220));
   }
 
   if (state === "complete") return null;
 
   return (
-    <section className={`envelope-intro intro-${state}`} aria-label="Wedding invitation introduction">
+    <section className={`envelope-intro gif-intro gif-${state}`} aria-label="Wedding invitation introduction">
+      <img ref={cover} className="gif-envelope-cover" src={coverSrc} alt="" aria-hidden="true" fetchPriority="high" onLoad={markReady} onError={markReady} />
+      <video
+        ref={video}
+        className="gif-envelope-animation"
+        src={animationSrc}
+        muted
+        playsInline
+        preload="auto"
+        aria-hidden="true"
+        onEnded={beginTransition}
+      />
       {state === "loading" ? (
-        <div className="intro-loader" role="status"><span /><p>Preparing your invitation</p></div>
+        <div className="gif-intro-loader" role="status" aria-live="polite"><span /><p>Preparing your invitation</p></div>
       ) : (
-        <div className="envelope-stage">
-          <div className="opening-bloom" aria-hidden="true" />
-          <div className="interior-glow" />
-          <div className="envelope-assembly">
-            <div className="flap-wrap flap-left"><img src={`${assetRoot}/panel-left.png`} alt="" /></div>
-            <div className="flap-wrap flap-right"><img src={`${assetRoot}/panel-right.png`} alt="" /></div>
-            <div className="flap-wrap flap-bottom"><img src={`${assetRoot}/panel-bottom.png`} alt="" /></div>
-            <div className="flap-wrap flap-top">
-              <img src={`${assetRoot}/panel-top.png`} alt="" />
-              <button
-                className="wax-trigger"
-                type="button"
-                onPointerDown={openInvitation}
-                onClick={openInvitation}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    openInvitation();
-                  }
-                }}
-                disabled={state !== "idle"}
-                aria-label="Open wedding invitation"
-              >
-                <span className="wax-halo" aria-hidden="true" />
-                <img src={`${assetRoot}/wax-seal.png`} alt="" aria-hidden="true" />
-              </button>
-              <span className="seal-cue" aria-hidden="true"><i />Tap to Open</span>
-            </div>
-          </div>
-        </div>
+        <button className="gif-start-button" type="button" onClick={startAnimation} aria-label="Open wedding invitation">
+          <span aria-hidden="true">Tap to Open</span>
+        </button>
       )}
+      <div className="gif-white-transition" aria-hidden="true" />
     </section>
   );
 }
