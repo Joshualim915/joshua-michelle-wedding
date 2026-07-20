@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from "react";
 
 type IntroState = "loading" | "idle" | "playing" | "transitioning" | "complete";
 
-const coverSrc = "/assets/envelope/gif-cover-frame.png";
-const animationSrc = "/assets/envelope/envelope-opening-slow.mp4";
-const animationDuration = 5280;
+const coverSrc = "/assets/envelope/gif-cover-frame-v2.png";
+const animationSrc = "/assets/envelope/envelope-opening-v2-slow.mp4";
+const animationDuration = 5867;
 
 export function EnvelopeIntro({ onComplete }: { onComplete: () => void }) {
   const [state, setState] = useState<IntroState>("loading");

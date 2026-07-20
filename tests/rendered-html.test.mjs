@@ -29,9 +29,9 @@ test("page renders the invitation, countdown, and RSVP flow", async () => {
 test("GIF-derived intro only begins on activation and retains the panel intro backup", async () => {
   const intro = await read("app/components/EnvelopeIntro.tsx");
   const backup = await read("app/components/EnvelopeIntro.backup.tsx");
-  assert.match(intro, /envelope-opening-slow\.mp4/);
-  assert.match(intro, /gif-cover-frame\.png/);
-  assert.match(intro, /animationDuration = 5280/);
+  assert.match(intro, /envelope-opening-v2-slow\.mp4/);
+  assert.match(intro, /gif-cover-frame-v2\.png/);
+  assert.match(intro, /animationDuration = 5867/);
   assert.match(intro, /onClick=\{startAnimation\}/);
   assert.match(intro, /image\?\.complete/);
   assert.match(intro, /gif-white-transition/);
