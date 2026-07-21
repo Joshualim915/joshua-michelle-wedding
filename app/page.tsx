@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { getSupabase } from "./supabase";
 import { EnvelopeIntro } from "./components/EnvelopeIntro";
 
@@ -134,6 +134,61 @@ function FallingPetals() {
   );
 }
 
+function AgendaFlower() {
+  return (
+    <span className="agenda-flower" aria-hidden="true">
+      <img src="/white-flowers-composition-arrangement-delicate-petals-blossom.png" alt="" />
+    </span>
+  );
+}
+
+function AgendaTimeline() {
+  const timeline = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let frame = 0;
+    const updateFlower = () => {
+      const node = timeline.current;
+      if (!node) return;
+      const rect = node.getBoundingClientRect();
+      const scrollStart = window.innerHeight * 0.72;
+      const scrollEnd = window.innerHeight * 0.26;
+      const progress = (scrollStart - rect.top) / Math.max(1, rect.height + scrollStart - scrollEnd);
+      node.style.setProperty("--agenda-progress", String(Math.min(1, Math.max(0, progress))));
+    };
+    const requestUpdate = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(updateFlower);
+    };
+
+    updateFlower();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, []);
+
+  return (
+    <div className="timeline agenda-timeline" ref={timeline}>
+      <AgendaFlower />
+      {events.map(([time, label], index) => (
+        <div
+          className="event"
+          key={time}
+          style={{ transitionDelay: `${index * 90}ms` }}
+        >
+          <time>{time}</time>
+          <i>·</i>
+          <p>{label}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
   const [introComplete, setIntroComplete] = useState(false);
   const [rsvpOpen, setRsvpOpen] = useState(false);
@@ -141,6 +196,7 @@ export default function Home() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [attending, setAttending] = useState("yes");
+  const music = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     document.body.classList.toggle("envelope-locked", !introComplete);
@@ -200,9 +256,17 @@ export default function Home() {
     }
   }
 
+  function startWeddingMusic() {
+    const audio = music.current;
+    if (!audio) return;
+    audio.volume = 0.42;
+    audio.play().catch(() => undefined);
+  }
+
   return (
     <main className={introComplete ? "invitation intro-complete" : "invitation intro-pending"}>
-      <EnvelopeIntro onComplete={() => setIntroComplete(true)} />
+      <audio ref={music} src="/audio/until-i-found-you.mp3" preload="none" loop />
+      <EnvelopeIntro onOpen={startWeddingMusic} onComplete={() => setIntroComplete(true)} />
       <FallingPetals />
 
       <div className="story">
@@ -268,20 +332,8 @@ export default function Home() {
         <section className="section schedule">
           <div className="reveal">
             <p className="eyebrow">Saturday · Nineteenth of June</p>
-            <h2>Order of Celebration</h2>
-            <div className="timeline">
-              {events.map(([time, label], index) => (
-                <div
-                  className="event"
-                  key={time}
-                  style={{ transitionDelay: `${index * 90}ms` }}
-                >
-                  <time>{time}</time>
-                  <i>·</i>
-                  <p>{label}</p>
-                </div>
-              ))}
-            </div>
+            <h2>Agenda</h2>
+            <AgendaTimeline />
           </div>
         </section>
 
@@ -308,9 +360,6 @@ export default function Home() {
             >
               RSVP
             </button>
-            <p className="monogram">
-              J <i>&amp;</i> M
-            </p>
           </div>
         </section>
       </div>

@@ -74,9 +74,10 @@
 16. Reduced the wax seal shadow to a small warm paper contact shadow in both idle and opening states, removing the dark frame effect beneath it.
 17. Enlarged the responsive scene to at least 118vw and a 118dvh-derived aspect-safe width, deliberately cropping the envelope beyond mobile edges. The side panels were brought inward to preserve a sealed, full-cover composition.
 18. Added a server-rendered intro gate that hides the RSVP story until `intro-complete` is set. This prevents slow device hydration or asset loading from flashing the landing page under the cover.
-19. Preserved the original panel-based intro in `app/components/EnvelopeIntro.backup.tsx`. The supplied 496 × 864, 4-second GIF is retained as source and was converted into a 389 KB, 5.28-second H.264 playback asset for much faster loading and controllable tap-to-start behavior. A static first frame holds before activation; a full white transition begins during the final 460 ms, then releases into the live landing page.
+19. The supplied 720 × 1280 GIF was converted into a 613 KB, 2.67-second H.264 playback asset for fast, controllable tap-to-start behavior. A static first frame holds before activation; a full white transition begins during the final 460 ms, then releases into the live landing page. Superseded panel-based and earlier GIF-derived assets were removed at the couple’s request.
 20. Added a cached-image readiness check to the GIF cover. A hard refresh can no longer miss React’s image load event and remain on the loading screen indefinitely.
 21. Replaced the live playback assets with the 720 × 1280 updated J&M Wedding RSVP opening GIF. Its 16 MB source was converted to a 1.1 MB, 5.87-second tap-to-play H.264 asset with a matching static cover frame; earlier GIF-derived assets remain untouched as fallback files.
+22. Replaced the live playback again with the user-trimmed 2.4-second source GIF. The new v3 derived playback is 654 KB and 3 seconds long; v2 remains preserved as a fallback.
 
 ## Follow-up polish
 

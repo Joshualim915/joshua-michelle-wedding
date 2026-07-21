@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 
 type IntroState = "loading" | "idle" | "playing" | "transitioning" | "complete";
 
-const coverSrc = "/assets/envelope/gif-cover-frame-v2.png";
-const animationSrc = "/assets/envelope/envelope-opening-v2-slow.mp4";
-const animationDuration = 5867;
+const coverSrc = "/assets/envelope/opening-cover.png";
+const animationSrc = "/assets/envelope/opening-animation.mp4";
+const animationDuration = 2667;
 
-export function EnvelopeIntro({ onComplete }: { onComplete: () => void }) {
+export function EnvelopeIntro({ onComplete, onOpen }: { onComplete: () => void; onOpen?: () => void }) {
   const [state, setState] = useState<IntroState>("loading");
   const timers = useRef<number[]>([]);
   const started = useRef(false);
@@ -42,6 +42,7 @@ export function EnvelopeIntro({ onComplete }: { onComplete: () => void }) {
   function startAnimation() {
     if (started.current || state !== "idle") return;
     started.current = true;
+    onOpen?.();
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       beginTransition();

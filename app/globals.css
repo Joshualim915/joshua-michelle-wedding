@@ -289,8 +289,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .intro-loader p { margin:0; text-transform:uppercase; letter-spacing:.25em; font-size:8px; }
 @keyframes loader-spin{to{rotate:360deg}}
 
-/* GIF cover: the previous panel-based implementation is retained in
-   EnvelopeIntro.backup.tsx. The final white flash hands the GIF into the live page. */
+/* Tap-to-play opening cover. The final white flash hands the animation into the live page. */
 .gif-intro { background: #eee7dc; }
 .gif-envelope-cover,.gif-envelope-animation { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center 52%; transform:scale(1.1); }
 .gif-envelope-cover { opacity:1; transition:opacity .22s ease; }
@@ -299,7 +298,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .gif-intro-loader span { width:38px; aspect-ratio:1; margin:auto; border:1px solid rgba(82,99,79,.22); border-top-color:#61715e; border-radius:50%; animation:loader-spin 1.2s linear infinite; }
 .gif-intro-loader p { margin:0; text-transform:uppercase; letter-spacing:.25em; font-size:8px; }
 .gif-start-button { position:absolute; z-index:4; inset:0; border:0; padding:0; cursor:pointer; background:transparent; color:#665a50; font:500 9px/1.2 "DM Sans",sans-serif; letter-spacing:.26em; text-transform:uppercase; }
-.gif-start-button span { position:absolute; left:50%; bottom:9dvh; translate:-50% 0; padding:11px 15px; border-bottom:1px solid rgba(89,74,59,.42); white-space:nowrap; animation:gif-cue 2.2s ease-in-out infinite; }
+.gif-start-button span { position:absolute; left:50%; top:calc(50% + min(16dvh, 132px)); translate:-50% 0; padding:11px 15px; border-bottom:1px solid rgba(89,74,59,.42); white-space:nowrap; animation:gif-cue 2.2s ease-in-out infinite; }
 .gif-start-button:focus-visible { outline:2px solid #5a6b58; outline-offset:-12px; }
 .gif-white-transition { position:absolute; z-index:5; inset:-8%; opacity:0; pointer-events:none; background:#fffefa; transition:opacity .64s cubic-bezier(.22,.61,.36,1); }
 .gif-playing .gif-envelope-cover,.gif-transitioning .gif-envelope-cover { opacity:0; }
@@ -477,6 +476,25 @@ h2 { margin: 0 0 25px; color: var(--deep); font: 400 40px/1.04 "Cormorant Garamo
 .schedule { background: #f7f4ed; }
 .schedule > .reveal { width: 100%; }
 .timeline { width: 100%; max-width: 370px; margin: 30px auto 0; }
+.agenda-timeline { --agenda-progress: 0; position: relative; }
+.agenda-flower {
+  position: absolute;
+  z-index: 3;
+  left: calc(39.5% + 13px);
+  top: calc(var(--agenda-progress) * (100% - 42px));
+  width: 42px;
+  height: 42px;
+  translate: -50% -3px;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 6px rgba(62, 55, 45, .14));
+  transition: top .12s linear;
+}
+.agenda-flower img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
 .event { min-height: 70px; display: grid; grid-template-columns: 1fr 28px 1.35fr; align-items: center; position: relative; text-align: left; opacity: 0; transform: translateY(15px); transition: opacity .6s, transform .6s; }
 .revealed .event { opacity: 1; transform: none; }
 .event::before { content: ""; position: absolute; left: calc(39.5% + 13px); top: 0; bottom: 0; width: 1px; background: #c8c1b2; }
@@ -550,6 +568,7 @@ h2 { margin: 0 0 25px; color: var(--deep); font: 400 40px/1.04 "Cormorant Garamo
 .closing h2 { color: #fff; font-size: 45px; }
 .closing .primary-button { margin-top: 35px; color: var(--deep); background: #f7f3e9; border-color: #f7f3e9; }
 .closing .primary-button:hover { background: var(--deep); color: #f7f3e9; border-color: var(--deep); }
+.closing .rsvp-button { min-height: 64px; padding: 0 44px; font-size: 15px; letter-spacing: .2em; }
 .monogram { margin: 75px 0 0; font: 35px "Italiana"; }
 .monogram i { font: italic 24px "Cormorant Garamond"; }
 

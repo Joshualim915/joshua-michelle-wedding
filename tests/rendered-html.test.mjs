@@ -19,6 +19,7 @@ test("page renders the invitation, countdown, and RSVP flow", async () => {
   assert.match(page, /Countdown/);
   assert.match(page, /2027-06-19/);
   assert.match(page, /RSVP/);
+  assert.match(page, /until-i-found-you\.mp3/);
   assert.doesNotMatch(page, /Add to calendar/);
   assert.match(page, /getSupabase/);
   assert.match(page, /from\("rsvps"\)/);
@@ -26,18 +27,27 @@ test("page renders the invitation, countdown, and RSVP flow", async () => {
   assert.doesNotMatch(page, /Garden formal/);
 });
 
-test("GIF-derived intro only begins on activation and retains the panel intro backup", async () => {
+test("GIF-derived intro only begins on activation", async () => {
   const intro = await read("app/components/EnvelopeIntro.tsx");
-  const backup = await read("app/components/EnvelopeIntro.backup.tsx");
-  assert.match(intro, /envelope-opening-v2-slow\.mp4/);
-  assert.match(intro, /gif-cover-frame-v2\.png/);
-  assert.match(intro, /animationDuration = 5867/);
+  assert.match(intro, /opening-animation\.mp4/);
+  assert.match(intro, /opening-cover\.png/);
+  assert.match(intro, /animationDuration = 2667/);
   assert.match(intro, /onClick=\{startAnimation\}/);
+  assert.match(intro, /onOpen\?\.\(\)/);
   assert.match(intro, /image\?\.complete/);
   assert.match(intro, /gif-white-transition/);
-  assert.match(backup, /LegacyEnvelopeIntro/);
-  assert.match(backup, /panel-left\.png/);
-  assert.match(backup, /wax-trigger/);
+});
+
+test("agenda section has a scroll-tracking flower and the closing RSVP has no monogram", async () => {
+  const page = await read("app/page.tsx");
+  const styles = await read("app/globals.css");
+  assert.match(page, /<h2>Agenda<\/h2>/);
+  assert.doesNotMatch(page, /Order of Celebration/);
+  assert.match(page, /AgendaTimeline/);
+  assert.match(styles, /agenda-flower/);
+  assert.match(styles, /--agenda-progress/);
+  assert.match(styles, /\.closing \.rsvp-button/);
+  assert.doesNotMatch(page, /<p className="monogram">/);
 });
 
 test("the RSVP content is server-gated until the intro completes", async () => {
